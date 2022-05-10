@@ -1,0 +1,7 @@
+MSG_HTTP_CODE = "Błędny status kod. Oczekiwana wartość 200"
+MSG_DATA = "Oczekiwano następujące dane: {}"
+MSG_EXPECTED_KEY = "W odpowiedzi serwera oczekiwano klucz: {}"
+MSG_SINGLE_RECORD = "Oczekiwano 1 rekord w bazie danych"
+MSG_NOTE_TYPE_RECORD = "Oczekiwano rekord z nazwą: {}"
+MSG_NO_RECORDS = "Oczekiwano rekord z nazwą: {}"
+MSG_CREATED_AT_KEY = "Oczekiwano 'created at'': {}"

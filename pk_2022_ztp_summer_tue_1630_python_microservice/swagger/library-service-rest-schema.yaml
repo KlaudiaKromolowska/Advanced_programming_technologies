@@ -1,0 +1,238 @@
+openapi: "3.0.3"
+info:
+  title: "Library Service"
+  version: "0.0.2"
+servers:
+  - url: "http://localhost:5000"
+    description: "Domyślny adres używany przez framework Flask"
+paths:
+  /users:
+    get:
+      tags:
+        - "Microservice Library"
+      summary: "Zwraca listę użytkowników biblioteki"
+      description: 'Listę użytkowników biblioteki tworzymy na podstawie listy którą otrzymamy wysyłając zapytanie
+                    "/users?library_access=true  do serwisu ADMIN.'
+      responses:
+        200:
+          description: "Lista użytkowników zwrócona powodzeniem"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UsersList"
+
+  /users/{id}:
+    get:
+      tags:
+        - "Microservice Library"
+      summary: "Informacje o koncie użytkownika o podanym id"
+      description: 'Pole "username" pobierane jest poprzez zapytanie do serwisu admin /user/{id}. W otrzymanej odpowiedzi należy sprawdzić czy użytkownik ma dostęp do biblioteki (pole library_access==True). Jeśli nie to należy zwrócić tylko status code 404.'
+      parameters:
+        - in: path
+          name: "id"
+          schema:
+            type: integer
+          required: true
+          description: "Unikatowy identyfikator użytkownika"
+      responses:
+        200:
+          description: "Informacje o stanie konta użytkownika"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  uuid:
+                    type: integer
+                    description: "Id użytkownika"
+                    nullable: false
+                  username:
+                    type: string
+                    description: "Nazwa użytkownika"
+                    nullable: false
+                  books:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          description: "ID wypożyczonej książki"
+                          nullable: false
+                        rental_date:
+                          type: string
+                          description: "Data wypożyczenia egzemplarza"
+                          format: date
+                          nullable: false
+                        return_date:
+                          type: string
+                          description: "Data wypożyczenia egzemplarza"
+                          format: date
+                          nullable: true
+                        
+                      required:
+                        - id
+                        - rental_date
+                        - return_date
+                required:
+                  - uuid
+                  - username
+                  - books
+
+        400:
+          description: "Nie podano ID użytkownika lub ID w złym formacie"
+        404:
+          description: "Użytkownik o podanym ID nie istnieje lub nie ma dostępu do biblioteki"
+
+  /users/{id}/books:
+    get:
+      tags:
+        - "Microservice Library"
+      summary: "Zwraca liczbę wypozyczonych książek przez użytkownika"
+      parameters:
+        - in: path
+          name: "id"
+          schema:
+            type: integer
+          required: true
+          description: "Unikatowy identyfikator użytkownika"
+      responses:
+        200:
+          description: "Informacje o stanie konta użytkownika"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  uuid:
+                    type: integer
+                    description: "Id użytkownika"
+                    nullable: false
+                  books:
+                    type: integer
+                    nullable: false
+                    description: "Liczba wypożyczonych książek"
+
+                required:
+                  - uuid
+                  - books
+
+  /books:
+    get:
+      tags:
+        - "Microservice Library"
+      summary: "Zwraca listę tytułów książek"
+      responses:
+        200:
+          description: "Lista tytułów zwrócona z powodzeniem"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TitleBookList"
+
+  /books/rent/{id}:
+    patch:
+      tags:
+        - "Microservice Library"
+      summary: "Operacja wypożyczenie egzemplarza książki o podanym {id}"
+      description: "Dla podanego uuid należy sprawdzić czy użytkownik ma dostęp do biblioteki wysyłając zapytanie /users/{id} do sytemu admin a następnie sprawdzić czy pole library_access jest True"
+
+      parameters:
+        - in: path
+          name: "id"
+          required: true
+          example: 3
+          schema:
+            type: integer
+          description: "ID tytułu który jest wypożyczany"
+
+        - in: header
+          name: "uuid"
+          required: true
+          example: 20
+          schema:
+            type: integer
+            description: "Identyfikator użytkownika który wypożycza książkę"
+
+      responses:
+        201:
+          description: "Wypożyczenie egzemplarza zakończone powodzeniem"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RentalDetalis"
+
+        400:
+          description: "Podany identyfikator książki nie istnieje lub jest nieprawidłowy"
+        401:
+          description: "Podany identyfikator użytkownika nie istnieje lub jest nieprawidłowy"
+        409:
+          description: "Nie ma dostępnych wolnych egzemplarzy dla podanego identyfikatora książki"
+
+components:
+  schemas:
+    User:
+      description: "Informacje o użytkowniku systemu"
+      properties:
+        uuid:
+          type: integer
+          description: "Unikatowy identyfikator użytkownika"
+          nullable: false
+        username:
+          type: string
+          description: "Nazwa użytkownika"
+          nullable: false
+      required:
+        - uuid
+        - username
+    UsersList:
+      description: "Lista użytkówników"
+      type: array
+      items:
+        $ref: "#/components/schemas/User"
+
+    TitleBook:
+      description: "Informacje o tytule książki"
+      properties:
+        utid:
+          type: integer
+          nullable: false
+          description: "Unikatowy identyfikator tytułu książki"
+        title:
+          type: string
+          nullable: false
+          description: "Tytuł książki"
+        author:
+          type: string
+          nullable: false
+          description: "Autor książki"
+        quantity:
+          type: integer
+          nullable: false
+          description: "Sumaryczna iczba egzemplarzy tytułu w biliotece (wypożyczonych + dostępnych)."
+        avalible:
+          type: integer
+          nullable: false
+          description:  |
+                        Liczba dostępnych egzemplarzy. Pole to należy wyznaczyć przy pomocy kwerendy: 
+                        SELECT (b.quantity - COUNT(r.id)) as available
+                        FROM tbl_rentals as r
+                        INNER JOIN tbl_books as b ON r.book_id = b.id
+                        WHERE r.book_id={{utid}} and r.return_date ISNULL;
+    TitleBookList:
+      description: "Lista tytułów"
+      type: array
+      items:
+        $ref: "#/components/schemas/TitleBook"
+    RentalDetalis:
+      description: "Szczegóły wypożyczonego egzemplarza"
+      properties:
+        rental_date:
+          type: string
+          description: "Data wypożyczenia egzemplarza"
+          format: date
+          nullable: false
+        uuid:
+          type: integer
+          description: "Unikatowy identyfikator użytkownika"
+          nullable: false

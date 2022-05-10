@@ -1,0 +1,143 @@
+openapi: '3.0.3'
+info:
+  title: 'Admin Service'
+  version: '0.0.2'
+servers:
+  - url: 'http://localhost:5001'
+    description: 'Domyślny adres używany przez framework Flask'
+paths:
+  /users:
+    get:
+      tags:  
+        - 'Microservice Admin'
+      summary: 'Zwraca listę użytkowników w systemie.'
+      description: ""
+      parameters: 
+        - in: query
+          name: library_access
+          description: 'Opcjonalny parametr, którego wartość jeśli jest ustawiona na True, wówczas zwraca TYLKO, użytkowników, którzy mają dostęp do biblioteki. Jeśli parametr ma ustwioną wartość na False, wówczas zwrócona lista zawiera TYLKO użytkowników, którzy nie mają dostępu do biblioteki. Jeśli parametr nie zostanie przekazany w zapytaniu wówczas zwrócona będzie lista wszystkich użytkowników w systemie.'
+          schema:
+            type: boolean
+      responses:
+        200:
+          description: 'Lista użytkowników zwrócona powodzeniem'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsersList'
+    post:
+      summary: 'Dodaje nowego użytkownika do systemu'
+      tags:  
+        - 'Microservice Admin'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                    nullable: false
+                    type: string
+                library_access:
+                  type: boolean
+                  default: false
+                  nullable: false
+              required: 
+                - username
+      responses:
+        200:
+          description: 'Użytkownik dodany do systemu z powodzeniem'
+          content:
+            application/json:
+                schema:
+                  $ref: '#/components/schemas/User'
+  
+  /users/{id}:
+    delete:
+      summary: 'Usuwa użytkownika z systemu'
+      description: 'Nie można usunąć użytkownika jeśli posiada na koncie nie oddane książki. Wykonać zapytanie ""/user/{id}/books" do serwisu library aby sprawdzić ile książek  wypożyczonych ma użytkownik.'
+      tags:  
+      - 'Microservice Admin'
+      parameters:
+        - in: path
+          name: 'id'
+          schema:
+            type: integer
+          required: true
+          description: 'Unikatowy identyfikator użytkownika'
+        
+              
+      
+      responses:
+          200:
+              description: 'Usunięcie użytkownika z systemu zakończyło się powodzeniem'
+          400:
+              description: 'Nie podano ID uzytkownika lub ID w złym formacie'
+          403:
+              description: 'Nie można usunąć użytkownika z powodu nie zwrócenia wszystkich książek'
+          404:
+              description: 'Użytkownik o podanym ID nie istnieje'
+    get:
+      tags:  
+        - 'Microservice Admin'
+      summary: 'Informacje o użytkowniku.'
+      parameters:
+        - in: path
+          name: 'id'
+          schema:
+            type: integer
+          required: true
+          description: 'Unikatowy identyfikator użytkownika'
+       
+      responses:
+        200:
+          description: 'Poprawnie zwrócona informacja o użytkowniku.'
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+                
+                  
+                   
+        400:
+          description: 'Nie podano ID użytkownika lub ID w złym formacie'
+        404:
+          description: 'Użytkownik o podanym ID nie istnieje'
+  
+  
+          
+          
+  
+
+components:
+  schemas:
+    User:
+      description: 'Informacje o użytkowniku systemu'
+      properties:
+        uuid:
+          type: integer
+          description: 'Unikatowy identyfikator użytkownika'
+          nullable: false
+        username:
+          type: string
+          description: 'Nazwa użytkownika'
+          nullable: false
+        library_access:
+          type: boolean
+          description: 'True jeśli użytkonik ma dostęp do biblioteki'
+          nullable: false
+      required: 
+        - uuid
+        - username
+        - library_access
+        
+
+    
+    UsersList:
+      description: 'Lista użytkówników'
+      type: array
+      items: 
+          $ref: '#/components/schemas/User'
+   
+    
+    

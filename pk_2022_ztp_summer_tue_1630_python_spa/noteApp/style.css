@@ -1,0 +1,103 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box
+}
+
+html {
+  font-family: sans-serif;
+  font-size: 1rem;
+  color: #444;
+}
+
+[type="text"],
+button {
+  display: inline-block;
+  -webkit-appearance: none;
+  padding: .5rem 1rem;
+  font-size: 1rem;
+  border: 2px solid #ccc;
+  border-radius: 4px;
+}
+
+button {
+  cursor: pointer;
+  background: #007bff;
+  color: white;
+  border: 2px solid #007bff;
+  margin: 0 .5rem;
+}
+
+[type="text"] {
+  width: 100%;
+}
+
+[type="text"]:active,
+[type="text"]:focus {
+  outline: 0;
+  border: 2px solid #007bff;
+}
+
+
+h1 {
+  color: #222;
+}
+
+li span:hover {
+  background: rgba(179, 215, 255, 0.52);
+}
+
+li span:focus {
+  outline: 0;
+  border: 2px solid #007bff;
+  background: rgba(179, 207, 255, 0.52)
+}
+
+.nav-tabs{
+  margin-bottom: 10px;
+}
+
+.filter-header{
+  margin: 20px 0;
+}
+
+.filter-header select, .filter-header input{
+   height: 40px;
+}
+
+.spinner-wrapper{
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.2);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#note-container, #type-container{
+  position: relative;
+}
+
+#myTab{
+  margin-top: 20px;
+}
+
+#root{
+  min-height: 100vh;
+  background: #fefefe;
+}
+
+body{
+  font-size: 18px;
+}
+
+.app-title{
+  margin-right: 20px;
+}
+
+.page-content{
+  margin-top: 10px;
+}

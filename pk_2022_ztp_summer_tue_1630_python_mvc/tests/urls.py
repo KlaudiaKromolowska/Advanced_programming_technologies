@@ -1,0 +1,6 @@
+INDEX_URL = '/'
+SHOW_USERS_URL = '/users'
+REGISTER_URL = '/register'
+REMOVE_URL = 'remove/{}'
+BOOKS_URL = '/books'
+GENERATE_BOOK_URL = '/generate_book/{}'

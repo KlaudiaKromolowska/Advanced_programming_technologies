@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+  <h1>Users books</h1>
+
+  <form method="post"> 
+    <div>
+      <label for="user_id">Pick a user:</label>
+      <select name="user_id" id="user_id" required>
+        {% for user in users %}
+          <option value="{{ user.id }}">{{ user.login }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div>
+      <label for="column_name">Sort by:</label>
+      <select name="column_name" id="column_name" required>
+        <option value="title">title</option>
+        <option value="created_at">created_at</option>
+      </select>
+    </div>
+   
+    <div>
+      <label for="order_by">Order by:</label>
+      <select name="order_by" id="order_by" required>
+        <option value="ASC">ASC</option>
+        <option value="DSC">DSC</option>
+      </select>
+    </div>
+    
+    <input type="submit" value="Filter books">
+  </form>
+
+  <ul>
+    {% for book in books %}
+      <li>Title: {{book.title}}</li>
+      <li>Created at: {{book.created_at}}</li>
+    {% endfor %}
+  </ul>
+
+{% endblock %}
